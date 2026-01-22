@@ -1,30 +1,108 @@
 version: "3.9"
 
 services:
+  # ======================
+  # FORMATION SERVICE
+  # ======================
   formation_service:
     build: ./formation_service
     container_name: formation_service
     ports:
       - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://formation_db:3307/formation_db
+      SPRING_DATASOURCE_USERNAME: formation_user
+      SPRING_DATASOURCE_PASSWORD: formation_pass
+    depends_on:
+      - formation_db
     networks:
       - formation_net
 
+  formation_db:
+    image: mysql:8.0
+    container_name: formation_db
+    environment:
+      MYSQL_DATABASE: formation_db
+      MYSQL_USER: formation_user
+      MYSQL_PASSWORD: formation_pass
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - formation_data:/var/lib/mysql
+    networks:
+      - formation_net
+
+  # ======================
+  # INSCRIPTION SERVICE
+  # ======================
   inscription_service:
     build: ./inscription_service
     container_name: inscription_service
     ports:
       - "8082:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://inscription_db:3307/inscription_db
+      SPRING_DATASOURCE_USERNAME: inscription_user
+      SPRING_DATASOURCE_PASSWORD: inscription_pass
+    depends_on:
+      - inscription_db
     networks:
       - formation_net
 
+  inscription_db:
+    image: mysql:8.0
+    container_name: inscription_db
+    environment:
+      MYSQL_DATABASE: inscription_db
+      MYSQL_USER: inscription_user
+      MYSQL_PASSWORD: inscription_pass
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - inscription_data:/var/lib/mysql
+    networks:
+      - formation_net
+
+  # ======================
+  # STUDENT SERVICE
+  # ======================
   student_service:
     build: ./student_service
     container_name: student_service
     ports:
       - "8083:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://student_db:3307/student_db
+      SPRING_DATASOURCE_USERNAME: student_user
+      SPRING_DATASOURCE_PASSWORD: student_pass
+    depends_on:
+      - student_db
     networks:
       - formation_net
 
+  student_db:
+    image: mysql:8.0
+    container_name: student_db
+    environment:
+      MYSQL_DATABASE: student_db
+      MYSQL_USER: student_user
+      MYSQL_PASSWORD: student_pass
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - student_data:/var/lib/mysql
+    networks:
+      - formation_net
+
+# ======================
+# VOLUMES
+# ======================
+volumes:
+  formation_data:
+  inscription_data:
+  student_data:
+
+# ======================
+# NETWORK
+# ======================
 networks:
   formation_net:
     driver: bridge
+
